@@ -40,12 +40,16 @@ const uploadDocument = async (req, res) => {
 	await generateFileHash(encryptedPath);
     const signature = signHash(hash);
 
+const fileSize =
+  req.file.size;
+
     const document = await prisma.document.create({
       data: {
         filename: req.file.filename,
         encryptedPath,
         hash,
         signature,
+        size: fileSize,
         ownerId: req.user.id
       }
     });

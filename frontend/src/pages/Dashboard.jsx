@@ -122,6 +122,59 @@ function Dashboard() {
 
   };
 
+const handleDownload =
+  async (id) => {
+
+    try {
+
+      const response =
+        await API.get(
+
+          `/documents/download/${id}`,
+
+          {
+            responseType:
+              "blob",
+
+            headers: {
+              Authorization:
+                `Bearer ${token}`
+            }
+          }
+
+        );
+
+      const url =
+        window.URL.createObjectURL(
+          new Blob([response.data])
+        );
+
+      const link =
+        document.createElement("a");
+
+      link.href = url;
+
+      link.setAttribute(
+        "download",
+        "document.enc"
+      );
+
+      document.body.appendChild(
+        link
+      );
+
+      link.click();
+
+    } catch (error) {
+
+      console.log(error);
+
+      alert("Download failed");
+
+    }
+
+  };
+
   const handleVerify = async (id) => {
 
     try {
@@ -218,6 +271,9 @@ function Dashboard() {
               <th className="p-3 text-left">
                 Date
               </th>
+            <th className="p-3 text-left">
+                Size
+              </th>
 
               <th className="p-3 text-left">
                 Actions
@@ -247,16 +303,33 @@ function Dashboard() {
                     ).toLocaleString()
                   }
                 </td>
+             <td className="p-3">
+
+                 {
+
+                   doc.size
+                    ?
+
+                    (
+                     doc.size / 1024
+                    ).toFixed(2)
+
+                    : "0"
+
+        } KB
+
+</td>
 
                 <td className="p-3 flex gap-2">
 
-                  <a
-                    href={`http://localhost:5000/api/documents/download/${doc.id}`}
-                    className="bg-blue-500 text-white px-4 py-2 rounded"
-                  >
-                    Download
-                  </a>
-
+		<button
+                  onClick={() =>
+                  handleDownload(doc.id)
+                  }
+                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                >
+                  Download
+               </button>
                   <button
                     onClick={() =>
                       handleVerify(doc.id)

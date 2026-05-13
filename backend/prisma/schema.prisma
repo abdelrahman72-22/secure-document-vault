@@ -31,6 +31,7 @@ model Document {
   encryptedPath   String
   hash            String
   signature       String
+  size            Int?
   createdAt       DateTime @default(now())
 
   ownerId         Int
