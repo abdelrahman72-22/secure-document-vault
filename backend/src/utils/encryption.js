@@ -3,17 +3,25 @@ const fs = require("fs");
 
 const algorithm = "aes-256-cbc";
 
-const secretKey = crypto
-  .createHash("sha256")
-  .update("supersecretkey")
-  .digest("hex")
-  .substring(0, 32);
+// Auto-generate encryption key using secure RNG if not provided
+const secretKey = process.env.ENCRYPTION_KEY
+  ? Buffer.from(process.env.ENCRYPTION_KEY, "hex")
+  : crypto.randomBytes(32);
 
-const iv = crypto.randomBytes(16);
+if (secretKey.length !== 32) {
+  throw new Error("ENCRYPTION_KEY must be 32 bytes for AES-256-CBC");
+}
+
+// Log warning if using auto-generated key (development only)
+if (!process.env.ENCRYPTION_KEY && process.env.NODE_ENV !== "production") {
+  console.warn("⚠️  WARNING: Using auto-generated ENCRYPTION_KEY. For production, set ENCRYPTION_KEY in .env");
+}
 
 const encryptFile = (inputPath, outputPath) => {
 
   return new Promise((resolve, reject) => {
+
+    const iv = crypto.randomBytes(16);
 
     const cipher = crypto.createCipheriv(
       algorithm,
